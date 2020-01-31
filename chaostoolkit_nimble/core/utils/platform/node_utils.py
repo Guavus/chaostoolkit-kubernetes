@@ -35,8 +35,9 @@ def reboot_node(node_alias):
     node_username = NodeManager.node_obj.nodes[node_alias].username
     node_password = NodeManager.node_obj.nodes[node_alias].password
     # command = 'sshpass -p "guavus@123" ssh guavus@testautomation004-infra-01.cloud.in.guavus.com "nohup sleep 10m &"'
-    command = 'sshpass -p "guavus@123" ssh -tt guavus@testautomation004-infra-01.cloud.in.guavus.com \'echo guavus@123 | sudo -S -s sh -c "nohup sleep 10m &"\''
-    # command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "nohup reboot &"\'' % (node_password, node_username, node_hostname_domain, node_password)
+    # command = 'sshpass -p "guavus@123" ssh -tt guavus@testautomation004-infra-01.cloud.in.guavus.com \'echo guavus@123 | sudo -S -s sh -c "nohup sleep 10m &"\''
+    command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "nohup reboot &"\'' % (node_password, node_username, node_hostname_domain, node_password)
+    logger.info("Executing reboot node %s: %s" % (node_alias, command))
     return ShellUtils.execute_shell_command(command)
 
 
