@@ -6,6 +6,7 @@ from nimble.core.utils.shell_utils import ShellUtils
 
 NODE_PING_TIMEOUT = 90000
 NODE_GOING_DOWN_TIMEOUT = 10000
+NODE_SSH_TIMEOUT = 60000
 
 
 def _query_node_status(result):
@@ -13,6 +14,10 @@ def _query_node_status(result):
 
 
 def is_node_up_and_running(node_alias):
+    return is_node_pingable(node_alias) and is_node_sshable(node_alias)
+
+
+def is_node_pingable(node_alias):
     node_hostname_domain = NodeManager.node_obj.get_node_hostname_domain_by_alias(node_alias)
     command = ShellUtils.ping(node_hostname_domain, count=5)
     logger.info("Executing command: %s" % command)
@@ -21,9 +26,26 @@ def is_node_up_and_running(node_alias):
     return not "Request timeout" in response
 
 
+def is_node_sshable(node_alias):
+    node_hostname_domain = NodeManager.node_obj.get_node_hostname_domain_by_alias(node_alias)
+    node_username = NodeManager.node_obj.nodes[node_alias].username
+    node_password = NodeManager.node_obj.nodes[node_alias].password
+    command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "date"\'' % (
+        node_password, node_username, node_hostname_domain, node_password)
+    logger.info("Executing command: %s" % command)
+    response = ShellUtils.execute_shell_command(command).stderr
+    logger.debug(response)
+    return not ("Operation timed out" in response or "Connection refused" in response)
+
+
+@retry(stop_max_delay=NODE_SSH_TIMEOUT, wait_fixed=5000, retry_on_result=_query_node_status)
+def wait_for_node_to_be_sshable(node_alias):
+    return is_node_sshable(node_alias)
+
+
 @retry(stop_max_delay=NODE_PING_TIMEOUT, wait_fixed=5000, retry_on_result=_query_node_status)
 def wait_for_node_to_be_pingable(node_alias):
-    return is_node_up_and_running(node_alias)
+    return is_node_pingable(node_alias)
 
 
 def reboot_node(node_alias):
