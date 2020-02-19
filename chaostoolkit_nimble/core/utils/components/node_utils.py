@@ -1,7 +1,6 @@
 from logzero import logger
 from retrying import retry
 
-from nimble.core.entity.components import Components
 from nimble.core.entity.node_manager import NodeManager
 from nimble.core.utils.shell_utils import ShellUtils
 
@@ -56,7 +55,6 @@ def reboot_node(node_alias):
     command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "nohup reboot &"\'' % (
         node_password, node_username, node_hostname_domain, node_password)
     logger.info("Executing reboot node %s: %s" % (node_alias, command))
-
     return ShellUtils.execute_shell_command(command)
 
 
