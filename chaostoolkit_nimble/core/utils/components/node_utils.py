@@ -52,7 +52,10 @@ def reboot_node(node_alias):
     node_hostname_domain = NodeManager.node_obj.get_node_hostname_domain_by_alias(node_alias)
     node_username = NodeManager.node_obj.nodes[node_alias].username
     node_password = NodeManager.node_obj.nodes[node_alias].password
-    command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "nohup reboot &"\'' % (
+    # command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "nohup reboot &"\'' % (
+    #     node_password, node_username, node_hostname_domain, node_password)
+
+    command = 'sshpass -p "%s" ssh -tt %s@%s \'echo %s | sudo -S -s sh -c "sleep 5m"\'' % (
         node_password, node_username, node_hostname_domain, node_password)
     logger.info("Executing reboot node %s: %s" % (node_alias, command))
     return ShellUtils.execute_shell_command(command)
