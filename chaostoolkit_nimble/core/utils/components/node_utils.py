@@ -14,7 +14,7 @@ def _query_node_status(result):
 
 
 def is_node_up_and_running(node_alias):
-    return is_node_pingable(node_alias) and is_node_sshable(node_alias)
+    return is_node_sshable(node_alias)
 
 
 def is_node_pingable(node_alias):
